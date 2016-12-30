@@ -9,7 +9,7 @@ from PyQt4 import QtGui
 app = QtGui.QApplication(sys.argv)
 
 model = QtGui.QStringListModel()
-model.setStringList(['some', 'same', 'sometimes', 'something', 'somelier'])
+model.setStringList(['lucas', 'luquitas', 'angel', 'angelote', 'angelito'])
 
 completer = QtGui.QCompleter()
 completer.setModel(model)
