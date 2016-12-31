@@ -23,6 +23,7 @@ def get_passnames():
                                stderr=subprocess.PIPE)
     # wait for the process to terminate
     out, err = process.communicate()
+    # TODO: check this errcode
     errcode = process.returncode
     for word in out.split(' '):
         List.append(word)
@@ -40,48 +41,58 @@ class MyWindow(QtGui.QWidget):
 
         self.setGeometry(412, 250, 600, 150)
 
+        self.PassList = get_passnames()
+
         self.label = QtGui.QLabel()
         self.label.move(20, 20)
         self.label.setText("What are you looking for?")
 
-        self.pushButtonOK = QtGui.QPushButton(self)
-        self.pushButtonOK.setText("Get Pass")
-        self.pushButtonOK.clicked.connect(self.on_pushButtonOK_clicked)
-        self.pushButtonOK.setAutoDefault(True)
-
         self.model = QtGui.QStringListModel()
-        self.model.setStringList(get_passnames())
+        self.model.setStringList(self.PassList)
 
         self.completer = QtGui.QCompleter()
         self.completer.setModel(self.model)
 
         self.lineEdit = QtGui.QLineEdit(self)
-        self.lineEdit.returnPressed.connect(self.pushButtonOK.click)
         self.lineEdit.move(20, 40)
         self.lineEdit.setCompleter(self.completer)
+
+        self.pushButtonSearch = QtGui.QPushButton(self)
+        self.pushButtonSearch.setText("Search Pass")
+        self.pushButtonSearch.clicked.connect(self.Search)
+        self.pushButtonSearch.setAutoDefault(True)
+
+        self.lineEdit.returnPressed.connect(self.pushButtonSearch.click)
+        # TODO: check after text changed:
+        # http://stackoverflow.com/questions/12182133/pyqt4-combine-textchanged-and-editingfinished-for-qlineedit#12182671
 
         self.pushButtonCopy = QtGui.QPushButton(self)
         self.pushButtonCopy.setText("Copy Pass")
         self.pushButtonCopy.clicked.connect(self.on_pushButtonCopy_clicked)
         self.pushButtonCopy.setAutoDefault(True)
 
-        self.layoutHorizontal = QtGui.QHBoxLayout(self)
-        self.layoutHorizontal.addWidget(self.label)
-        self.layoutHorizontal.addWidget(self.lineEdit)
-        self.layoutHorizontal.addWidget(self.pushButtonOK)
-        self.layoutHorizontal.addWidget(self.pushButtonCopy)
+        self.gridLayout = QtGui.QGridLayout()
+        self.gridLayout.addWidget(self.label, 0, 1)
+        self.gridLayout.addWidget(self.lineEdit, 0, 2)
+        self.gridLayout.addWidget(self.pushButtonSearch, 1, 1)
+        self.gridLayout.addWidget(self.pushButtonCopy, 1, 2)
+        self.setLayout(self.gridLayout)
 
         self.lineEdit.setFocus()
 
     @QtCore.pyqtSlot()
-    def on_pushButtonOK_clicked(self):
-        passwd_received = get_pass(self.lineEdit.text())
-        print (passwd_received)
+    def Search(self):
+        passwdname_written = self.lineEdit.text()
+        if passwdname_written in self.PassList:
+            self.label.setText("Ready to Copy")
+            # TODO: grey button if not ready, test after each stroke or click
 
     def on_pushButtonCopy_clicked(self):
         passwd_received = get_pass(self.lineEdit.text())
         clipboard = QtGui.QApplication.clipboard()
         clipboard.setText(passwd_received)
+        self.label.setText("Password copied to Clipboard")
+
 
 
 if __name__ == "__main__":
