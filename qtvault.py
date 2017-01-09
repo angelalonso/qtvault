@@ -63,8 +63,6 @@ class MyWindow(QtGui.QWidget):
         self.pushButtonSearch.setAutoDefault(True)
 
         self.lineEdit.returnPressed.connect(self.pushButtonSearch.click)
-        # TODO: check after text changed:
-        # http://stackoverflow.com/questions/12182133/pyqt4-combine-textchanged-and-editingfinished-for-qlineedit#12182671
 
         self.pushButtonCopy = QtGui.QPushButton(self)
         self.pushButtonCopy.setText("Copy Pass")
@@ -86,13 +84,14 @@ class MyWindow(QtGui.QWidget):
         if passwdname_written in self.PassList:
             self.label.setText("Ready to Copy")
             # TODO: grey button if not ready, test after each stroke or click
+        else:
+            self.label.setText("Nothing found, try again")
 
     def on_pushButtonCopy_clicked(self):
         passwd_received = get_pass(self.lineEdit.text())
         clipboard = QtGui.QApplication.clipboard()
         clipboard.setText(passwd_received)
         self.label.setText("Password copied to Clipboard")
-
 
 
 if __name__ == "__main__":
